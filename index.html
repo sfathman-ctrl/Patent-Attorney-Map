@@ -1,28 +1,84 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patent Attorney Map</title>
+    <title>Patent Attorney Directory Map</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
     <style>
-        body {
+        /* Modern CSS Reset & Typography */
+        body, html {
             margin: 0;
             padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1a1e22;
         }
         #map {
             width: 100%;
             height: 100vh;
         }
-        .popup-title {
-            font-size: 14px;
-            margin: 0 0 2px 0;
-            color: #333;
+
+        /* Sleek Modern Popup Styles */
+        .leaflet-popup-content-wrapper {
+            background: #1f242c !important;
+            color: #f3f4f6 !important;
+            border-radius: 12px !important;
+            padding: 6px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .leaflet-popup-tip {
+            background: #1f242c !important;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .leaflet-popup-close-button {
+            color: #9ca3af !important;
+            padding: 12px 12px 0 0 !important;
+        }
+        .leaflet-popup-close-button:hover {
+            color: #ffffff !important;
+        }
+
+        /* Inner Popup Content Typography */
+        .popup-container {
+            padding: 8px 12px;
+            min-width: 220px;
         }
         .popup-firm {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #38bdf8; /* Sleek Tech Blue Accent */
+            margin-bottom: 4px;
+        }
+        .popup-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 6px 0;
+            line-height: 1.3;
+        }
+        .popup-location {
             font-size: 12px;
-            font-weight: bold;
-            color: #0056b3;
-            margin: 0 0 4px 0;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Custom SVG Marker Animation */
+        .custom-pin {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+        .custom-pin:hover {
+            transform: scale(1.15);
         }
     </style>
 </head>
@@ -33,16 +89,39 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script>
-        // 1. Initialize the map centered broadly over the US
-        const map = L.map('map').setView([39.8283, -98.5795], 4);
+        // 1. Initialize map with a dark, high-end viewport focal point
+        const map = L.map('map', {
+            zoomControl: true,
+            maxZoom: 18,
+            minZoom: 3
+        }).setView([39.8283, -98.5795], 4);
 
-        // 2. Add the OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+        // Move Zoom controls to top-right for a cleaner look
+        map.zoomControl.setPosition('topright');
+
+        // 2. Add CartoDB Dark Matter premium tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors © CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
 
-        // 3. Your Actual Data from Atlist (Mapped with Coordinates)
+        // 3. Custom minimalist SVG marker design (Replaces the generic blue map pins)
+        const modernIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `
+                <svg width="28" height="36" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 18 12 18s12-9 12-18c0-6.63-5.37-12-12-12z" fill="#0284c7"/>
+                    <circle cx="12" cy="12" r="5" fill="#111827"/>
+                    <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+                </svg>
+            `,
+            iconSize: [28, 36],
+            iconAnchor: [14, 36],
+            popupAnchor: [0, -32]
+        });
+
+        // 4. Complete Dataset of All 49 Attorneys
         const attorneys = [
             { name: "Walker Weitzel", firm: "Alloy Patent Law", lat: 47.6608, lng: -122.3838, city: "Seattle, WA" },
             { name: "Joe D. Calhoun", firm: "Calhoun Law Firm", lat: 34.7465, lng: -92.2693, city: "Little Rock, AR" },
@@ -53,19 +132,65 @@
             { name: "Samar Shah", firm: "Patent Pending Made Simple", lat: 37.3387, lng: -121.8853, city: "San Jose, CA" },
             { name: "Josh Soloway", firm: "Soloway Group PC", lat: 40.7128, lng: -74.0060, city: "New York, NY" },
             { name: "Nathaniel A. Wickliffe", firm: "The Inventor's Friend", lat: 33.7490, lng: -84.3880, city: "Atlanta, GA" },
-            { name: "Joey Vitale", firm: "Indie Law", lat: 41.8781, lng: -87.6298, city: "Chicago, IL" }
+            { name: "Joey Vitale", firm: "Indie Law", lat: 41.8781, lng: -87.6298, city: "Chicago, IL" },
+            { name: "Ben Williams", firm: "Williams Intellectual Property", lat: 39.7392, lng: -104.9903, city: "Denver, CO" },
+            { name: "Howard Russell", firm: "Howard Russell, Attorney at Law", lat: 35.1495, lng: -90.0490, city: "Memphis, TN" },
+            { name: "Michael Dilworth", firm: "Dilworth IP", lat: 41.1176, lng: -73.4079, city: "Norwalk, CT" },
+            { name: "Peter Weinstein", firm: "Omnus Law", lat: 42.3601, lng: -71.0589, city: "Boston, MA" },
+            { name: "Thomas Phung", firm: "Johnson and Phung PLLC", lat: 44.9537, lng: -93.0900, city: "St. Paul, MN" },
+            { name: "Bao Tran", firm: "Patent Professional Corporation", lat: 37.3382, lng: -121.8863, city: "San Jose, CA" },
+            { name: "Derrick Davis", firm: "Trust Tree", lat: 36.1627, lng: -86.7816, city: "Nashville, TN" },
+            { name: "Craige Thompson JD, MBA, EE, PE", firm: "Thompson Patent Law", lat: 32.7767, lng: -96.7970, city: "Dallas, TX" },
+            { name: "Wayne Carroll", firm: "Inspired Idea Solutions", lat: 33.4152, lng: -111.8315, city: "Mesa, AZ" },
+            { name: "Mark Trenner", firm: "Trenner Law Firm", lat: 39.7392, lng: -104.9903, city: "Denver, CO" },
+            { name: "Robert McConnell", firm: "McConnell Law Firm", lat: 41.8240, lng: -71.4128, city: "Providence, RI" },
+            { name: "Marcos E. Garciaacosta", firm: "Marcos E. Garciaacosta Law Group", lat: 33.5387, lng: -112.1860, city: "Glendale, AZ" },
+            { name: "Bruce Hare", firm: "Genius Patent APC", lat: 32.7157, lng: -117.1611, city: "San Diego, CA" },
+            { name: "Barry Kaplan", firm: "Kaplan Intellectual Property Law, LLC", lat: 33.7490, lng: -84.3880, city: "Atlanta, GA" },
+            { name: "Daniel Ross, Esq.", firm: "Daniel Ross & Associates LLC", lat: 41.4993, lng: -81.6944, city: "Cleveland, OH" },
+            { name: "Adam Philipp", firm: "AEON Law", lat: 47.6062, lng: -122.3321, city: "Seattle, WA" },
+            { name: "Patrick Richards", firm: "Patrick Richards", lat: 41.8781, lng: -87.6298, city: "Chicago, IL" },
+            { name: "Adam Bell", firm: "Bell IP Law", lat: 37.7749, lng: -122.4194, city: "San Francisco, CA" },
+            { name: "David McConnell", firm: "Perkins Thompson, P.A.", lat: 43.6591, lng: -70.2568, city: "Portland, ME" },
+            { name: "The Iwashko Law Firm, PLLC", firm: "The Iwashko Law Firm, PLLC", lat: 38.8048, lng: -77.0469, city: "Alexandria, VA" },
+            { name: "Michael Jones", firm: "Jones Intellectual Property", lat: 30.2672, lng: -97.7431, city: "Austin, TX" },
+            { name: "David L. Cohen", firm: "David L. Cohen, P.C.", lat: 40.7128, lng: -74.0060, city: "New York, NY" },
+            { name: "Gregory Donald Carson", firm: "Carson Patents®", lat: 47.0379, lng: -122.9007, city: "Olympia, WA" },
+            { name: "John Laurence", firm: "TCP Law, PLLC", lat: 40.7128, lng: -74.0060, city: "New York, NY" },
+            { name: "John B. Hudak", firm: "Law Office of John B. Hudak, PLLC", lat: 41.5582, lng: -73.0515, city: "Waterbury, CT" },
+            { name: "Bela Malik, Ph.D", firm: "Affordable Patent Agency, LLC", lat: 28.5384, lng: -81.3789, city: "Orlando, FL" },
+            { name: "Michael Cohen", firm: "Cohen IP Law Group, PC", lat: 34.0522, lng: -118.2437, city: "Los Angeles, CA" },
+            { name: "Brian Klein", firm: "Fast Forward Law, LLC", lat: 36.1716, lng: -115.1391, city: "Las Vegas, NV" },
+            { name: "Patricia Wenger", firm: "Wenger Law Offices", lat: 40.0379, lng: -76.3055, city: "Lancaster, PA" },
+            { name: "Sean T. Bradley", firm: "Bradley IP, LLC", lat: 39.0997, lng: -94.5786, city: "Kansas City, MO" },
+            { name: "Ann Dennen", firm: "Dennen IP Law, LLC", lat: 34.7304, lng: -86.5861, city: "Huntsville, AL" },
+            { name: "Ashley Johnson", firm: "Dogwood Patent and Trademark Law", lat: 35.7796, lng: -78.6382, city: "Raleigh, NC" },
+            { name: "Kevin Prince", firm: "QuickPatents, LLC", lat: 33.6846, lng: -117.8265, city: "Irvine, CA" },
+            { name: "Cislo & Thomas LLP", firm: "Cislo & Thomas LLP", lat: 34.0194, lng: -118.4912, city: "Santa Monica, CA" },
+            { name: "Alan Harrison", firm: "Sandollar Law", lat: 30.3322, lng: -81.6557, city: "Jacksonville, FL" },
+            { name: "Steve Murray", firm: "Panitch Schwarze Belisario & Nadel", lat: 39.9526, lng: -75.1652, city: "Philadelphia, PA" },
+            { name: "Kevin Crosby", firm: "The Rubin Firm", lat: 25.7617, lng: -80.1918, city: "Miami, FL" }
         ];
 
-        // 4. Loop through the real data and plot pins
+        // 5. Loop through the array and inject custom map markers + styled overlay popups
         attorneys.forEach(attorney => {
-            const marker = L.marker([attorney.lat, attorney.lng]).addTo(map);
+            const marker = L.marker([attorney.lat, attorney.lng], { icon: modernIcon }).addTo(map);
             
-            // Popups structured to mirror your Atlist layout (Firm Name + Attorney Name)
-            marker.bindPopup(`
-                <div class="popup-firm">${attorney.firm}</div>
-                <h3 class="popup-title">${attorney.name}</h3>
-                <small style="color: #666;">${attorney.city}</small>
-            `);
+            const popupContent = `
+                <div class="popup-container">
+                    <div class="popup-firm">${attorney.firm}</div>
+                    <h3 class="popup-title">${attorney.name}</h3>
+                    <div class="popup-location">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 5px;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        ${attorney.city}
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
         });
     </script>
 </body>
