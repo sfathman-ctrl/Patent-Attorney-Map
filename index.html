@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +11,18 @@
         }
         #map {
             width: 100%;
-            height: 100vh; /* Takes up the whole screen */
+            height: 100vh;
+        }
+        .popup-title {
+            font-size: 14px;
+            margin: 0 0 2px 0;
+            color: #333;
+        }
+        .popup-firm {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0056b3;
+            margin: 0 0 4px 0;
         }
     </style>
 </head>
@@ -23,8 +33,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script>
-        // 1. Initialize the map centered on the United States
-        const map = L.map('map').setView([37.8, -96], 4);
+        // 1. Initialize the map centered broadly over the US
+        const map = L.map('map').setView([39.8283, -98.5795], 4);
 
         // 2. Add the OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -32,23 +42,29 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // 3. Your Patent Attorney Data
+        // 3. Your Actual Data from Atlist (Mapped with Coordinates)
         const attorneys = [
-            { name: "John Doe", firm: "IP Partners", lat: 38.9072, lng: -77.0369, city: "Washington, DC" },
-            { name: "Jane Smith", firm: "Patent Pros", lat: 34.0522, lng: -118.2437, city: "Los Angeles, CA" },
-            { name: "Alex Jones", firm: "Innovation Law", lat: 41.8781, lng: -87.6298, city: "Chicago, IL" }
-            // You can easily add more attorneys to this list following the same format!
+            { name: "Walker Weitzel", firm: "Alloy Patent Law", lat: 47.6608, lng: -122.3838, city: "Seattle, WA" },
+            { name: "Joe D. Calhoun", firm: "Calhoun Law Firm", lat: 34.7465, lng: -92.2693, city: "Little Rock, AR" },
+            { name: "William Childs", firm: "Childs Patent Law", lat: 29.7288, lng: -95.4165, city: "Houston, TX" },
+            { name: "Donn K. Harms", firm: "American Patent & Trademark Law Center", lat: 32.7157, lng: -117.1611, city: "San Diego, CA" },
+            { name: "Scott Seeley", firm: "Eastgate IP", lat: 47.6101, lng: -122.1416, city: "Bellevue, WA" },
+            { name: "Bill Hulsey", firm: "Hulsey PC", lat: 30.2672, lng: -97.7431, city: "Austin, TX" },
+            { name: "Samar Shah", firm: "Patent Pending Made Simple", lat: 37.3387, lng: -121.8853, city: "San Jose, CA" },
+            { name: "Josh Soloway", firm: "Soloway Group PC", lat: 40.7128, lng: -74.0060, city: "New York, NY" },
+            { name: "Nathaniel A. Wickliffe", firm: "The Inventor's Friend", lat: 33.7490, lng: -84.3880, city: "Atlanta, GA" },
+            { name: "Joey Vitale", firm: "Indie Law", lat: 41.8781, lng: -87.6298, city: "Chicago, IL" }
         ];
 
-        // 4. Loop through the data and place markers on the map
+        // 4. Loop through the real data and plot pins
         attorneys.forEach(attorney => {
             const marker = L.marker([attorney.lat, attorney.lng]).addTo(map);
             
-            // Create a popup window when a marker is clicked
+            // Popups structured to mirror your Atlist layout (Firm Name + Attorney Name)
             marker.bindPopup(`
-                <strong>${attorney.name}</strong><br>
-                ${attorney.firm}<br>
-                <small>${attorney.city}</small>
+                <div class="popup-firm">${attorney.firm}</div>
+                <h3 class="popup-title">${attorney.name}</h3>
+                <small style="color: #666;">${attorney.city}</small>
             `);
         });
     </script>
