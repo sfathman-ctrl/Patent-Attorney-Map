@@ -220,3 +220,14 @@ window.addEventListener('load', function() {
     </script>
 </body>
 </html>
+// 1. Recalculate layout as soon as the window completely loads
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 400); // Delays 400ms to ensure HubSpot's editor layout is fully expanded
+});
+
+// 2. Recalculate layout dynamically if the browser view or editor pane changes size
+window.addEventListener('resize', function() {
+    map.invalidateSize();
+});
