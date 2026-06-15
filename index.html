@@ -1,63 +1,61 @@
 <style>
-  /* 1. LAYER SHIELD WRAPPER */
-  /* Locks the map container so HubSpot's live builder animations don't crush its dimensions */
+  /* THE FIX: Stop HubSpot from forcing responsive image scaling on map tiles */
+  .leaflet-container img.leaflet-tile {
+    max-width: none !important;
+    max-height: none !important;
+    width: 256px !important; /* Forces absolute Leaflet tile dimensions */
+    height: 256px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Secure container boundaries */
   .hubspot-map-shield {
     width: 100% !important;
-    max-width: 100% !important;
     height: 600px !important; 
     position: relative !important;
-    display: block !important;
-    overflow: hidden !important;
-    background-color: #111827 !important; /* Clean dark fallback while tiles fetch */
+    background: #111827 !important; 
   }
 
   #map { 
     width: 100% !important; 
     height: 100% !important; 
-    position: absolute !important;
-    top: 0;
-    left: 0;
   }
 
-  /* 2. POPUP & MAP INTERFACE STYLING */
-  .leaflet-popup-content-wrapper { background: #1f242c !important; color: #f3f4f6 !important; border-radius: 12px !important; padding: 6px !important; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important; border: 1px solid rgba(255, 255, 255, 0.08); }
-  .leaflet-popup-tip { background: #1f242c !important; border: 1px solid rgba(255, 255, 255, 0.08); }
-  .leaflet-popup-close-button { color: #9ca3af !important; padding: 12px 12px 0 0 !important; }
-  .leaflet-popup-close-button:hover { color: #ffffff !important; }
+  /* Standard Popup Styles */
+  .leaflet-popup-content-wrapper { background: #1f242c !important; color: #f3f4f6 !important; border-radius: 12px !important; padding: 6px !important; }
+  .leaflet-popup-tip { background: #1f242c !important; }
   .popup-container { padding: 8px 12px; min-width: 220px; }
-  .popup-firm { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 4px; }
-  .popup-title { font-size: 16px; font-weight: 600; color: #ffffff; margin: 0 0 6px 0; line-height: 1.3; }
-  .popup-location { font-size: 12px; color: #9ca3af; display: flex; align-items: center; }
-  .custom-pin { display: flex; justify-content: center; align-items: center; transition: transform 0.2s ease; }
-  .custom-pin:hover { transform: scale(1.15); }
+  .popup-firm { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #38bdf8; margin-bottom: 4px; }
+  .popup-title { font-size: 16px; font-weight: 600; color: #ffffff; margin: 0 0 6px 0; }
+  .popup-location { font-size: 12px; color: #9ca3af; }
+  .custom-pin { display: flex; justify-content: center; align-items: center; }
 </style>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <div class="hubspot-map-shield">
   <div id="map"></div>
 </div>
 
 <script>
-  // 3. SECURE ENGINE INSTANTIATION
+  // Instantiate Map
   const map = L.map('map', {
     zoomControl: true, 
     maxZoom: 18, 
-    minZoom: 3,
-    trackResize: true 
+    minZoom: 3
   }).setView([39.8283, -98.5795], 4);
   
   map.zoomControl.setPosition('topright');
 
-  // Dark Canvas Map Tiles
+  // Dark Map Layer
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap contributors © CARTO',
+    attribution: '© CARTO',
     subdomains: 'abcd',
     maxZoom: 20
   }).addTo(map);
 
-  // Modern Vector Pin Styling
   const modernIcon = L.divIcon({
     className: 'custom-pin',
     html: `<svg width="28" height="36" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 18 12 18s12-9 12-18c0-6.63-5.37-12-12-12z" fill="#0284c7"/><circle cx="12" cy="12" r="5" fill="#111827"/><circle cx="12" cy="12" r="3" fill="#ffffff"/></svg>`,
@@ -66,7 +64,7 @@
     popupAnchor: [0, -32]
   });
 
-  // 4. FULLY REPAIRED & VALIDATED ATTORNEY DATASET
+  // Validated Database Array
   const attorneys = [
     { name: "Walker Weitzel", firm: "Alloy Patent Law", lat: 47.6608, lng: -122.3838, city: "Seattle, WA" },
     { name: "Joe D. Calhoun", firm: "Calhoun Law Firm", lat: 34.7465, lng: -92.2693, city: "Little Rock, AR" },
@@ -119,42 +117,22 @@
     { name: "Leon D. Bass", firm: "Leon Bass Law", lat: 40.0000, lng: -83.0000, city: "Columbus, OH" }
   ];
 
-  // Secure looping that filters out empty data blocks safely
   attorneys.forEach(attorney => {
     if (attorney.lat && attorney.lng) {
       const marker = L.marker([attorney.lat, attorney.lng], { icon: modernIcon }).addTo(map);
-      const popupContent = `
+      marker.bindPopup(`
         <div class="popup-container">
           <div class="popup-firm">${attorney.firm}</div>
           <h3 class="popup-title">${attorney.name}</h3>
-          <div class="popup-location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 5px;">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            ${attorney.city}
-          </div>
-        </div>`;
-      marker.bindPopup(popupContent);
+          <div class="popup-location">${attorney.city}</div>
+        </div>`);
     }
   });
 
-  // 5. HARD REPAIR UTILITIES FOR THE HUBSPOT LIVE PREVIEW
-  function runGlobalGridRepair() {
-    if (typeof map !== 'undefined' && map !== null) {
-      map.invalidateSize({ animate: false });
-    }
+  // Dynamic Layout Recalculation Trigger
+  function checkMapSize() {
+    map.invalidateSize();
   }
-
-  // Trigger corrections systematically across layout lifecycles
-  window.addEventListener('load', function() { setTimeout(runGlobalGridRepair, 200); });
-  window.addEventListener('resize', runGlobalGridRepair);
-
-  // Safety Loop: Constantly forces layout coherence during dynamic updates inside the editor panel
-  let verificationLoops = 0;
-  const layoutGuardInterval = setInterval(function() {
-    runGlobalGridRepair();
-    verificationLoops++;
-    if (verificationLoops > 15) { clearInterval(layoutGuardInterval); }
-  }, 750);
+  window.addEventListener('load', () => setTimeout(checkMapSize, 100));
+  window.addEventListener('resize', checkMapSize);
 </script>
