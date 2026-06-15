@@ -106,7 +106,7 @@
             maxZoom: 20
         }).addTo(map);
 
-        // 3. Custom minimalist SVG marker design (Replaces the generic blue map pins)
+        // 3. Custom minimalist SVG marker design
         const modernIcon = L.divIcon({
             className: 'custom-pin',
             html: `
@@ -191,6 +191,18 @@
             `;
             
             marker.bindPopup(popupContent);
+        });
+
+        // 6. HubSpot Layout Fix: Force Leaflet to recalculate container bounds on dynamic tab load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 400);
+        });
+        
+        // Handle window resizing or responsive panel expansion inside CRM dashboards
+        window.addEventListener('resize', () => {
+            map.invalidateSize();
         });
     </script>
 </body>
