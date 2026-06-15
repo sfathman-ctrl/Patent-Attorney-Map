@@ -204,6 +204,12 @@
         window.addEventListener('resize', () => {
             map.invalidateSize();
         });
+        // Force Leaflet to recalculate the layout after HubSpot finishes loading the page
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 500); // Waits half a second to ensure the container is fully visible
+});
     </script>
 </body>
 </html>
