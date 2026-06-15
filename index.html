@@ -210,6 +210,13 @@ window.addEventListener('load', function() {
         map.invalidateSize();
     }, 500); // Waits half a second to ensure the container is fully visible
 });
+        <style>
+  #map { 
+    width: 100% !important; 
+    height: 600px !important; /* Force an explicit height */
+    display: block;
+  }
+</style>
     </script>
 </body>
 </html>
