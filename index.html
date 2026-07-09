@@ -13,6 +13,12 @@
     --ink-soft:#2b3a48;
     --paper:#f6f3ec;
     --paper-dim:#ece7da;/* marker */
+    --brass:#9e1b32;
+    --brass-bright:#c53047;
+    --rule:#d8cfb8;
+    --text:#241f18;
+    --text-soft:#5c5546;
+  }
 .pin {
   width: 26px;
   height: 26px;
@@ -43,12 +49,6 @@ const marker = new maplibregl.Marker({
 If your intention is for the tip of the pin (not the bottom edge of the square) to sit exactly on the coordinate, the more robust solution is to draw the pin with SVG (or use a small wrapper element) instead of using CSS transforms. That completely eliminates marker movement while zooming and keeps the tip perfectly locked to the map coordinate.
 
 Uploading files? Try using
-}
-    --brass:#9e1b32;
-    --brass-bright:#c53047;
-    --rule:#d8cfb8;
-    --text:#241f18;
-    --text-soft:#5c5546;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;font-family:'Inter',sans-serif;color:var(--text);background:var(--paper);}
