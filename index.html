@@ -19,37 +19,6 @@
     --text:#241f18;
     --text-soft:#5c5546;
   }
-.pin {
-  width: 26px;
-  height: 26px;
-  border-radius: 50% 50% 50% 0;
-  background: var(--brass);
-  border: 2px solid var(--paper);
-
-  /* Keep the point fixed on the coordinate */
-  transform: rotate(-45deg);
-
-  /* Rotate around the center instead of shifting it */
-  transform-origin: center;
-
-  box-shadow: 0 2px 5px rgba(0,0,0,.35);
-  cursor: pointer;
-  transition: background .12s ease;
-}
-
-Leave your JavaScript exactly as it is:
-
-const marker = new maplibregl.Marker({
-  element: el,
-  anchor: 'bottom'
-})
-.setLngLat([a.lng, a.lat])
-.addTo(map);
-
-If your intention is for the tip of the pin (not the bottom edge of the square) to sit exactly on the coordinate, the more robust solution is to draw the pin with SVG (or use a small wrapper element) instead of using CSS transforms. That completely eliminates marker movement while zooming and keeps the tip perfectly locked to the map coordinate.
-
-Uploading files? Try using
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;font-family:'Inter',sans-serif;color:var(--text);background:var(--paper);}
 
@@ -162,6 +131,7 @@ Uploading files? Try using
 
   /* Keep the point fixed on the coordinate */
   transform: rotate(-45deg);
+  transform: translate(-50%, -100%) rotate(-45deg);
 
   /* Rotate around the center instead of shifting it */
   transform-origin: center;
