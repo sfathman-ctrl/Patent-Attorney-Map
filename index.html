@@ -159,13 +159,16 @@ Uploading files? Try using
   border-radius: 50% 50% 50% 0;
   background: var(--brass);
   border: 2px solid var(--paper);
-  /* The secret sauce: forces the bottom tip (0,0 point of rotation) to line up exactly on the coordinate */
-  transform: translate(-50%, -100%) rotate(-45deg);
-  transform-origin: bottom left; 
+
+  /* Keep the point fixed on the coordinate */
+  transform: rotate(-45deg);
+
+  /* Rotate around the center instead of shifting it */
+  transform-origin: center;
+
   box-shadow: 0 2px 5px rgba(0,0,0,.35);
   cursor: pointer;
-  transition: transform .12s ease, background .12s ease;
-}
+  transition: background .12s ease;
 
   .maplibregl-popup-content{
     padding:0;
