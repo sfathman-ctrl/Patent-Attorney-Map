@@ -12,7 +12,26 @@
     --ink:#182531;
     --ink-soft:#2b3a48;
     --paper:#f6f3ec;
-    --paper-dim:#ece7da;
+    --paper-dim:#ece7da;/* marker */
+.pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--brass);
+  border: 2px solid var(--paper);
+  /* The secret sauce: forces the bottom tip (0,0 point of rotation) to line up exactly on the coordinate */
+  transform: translate(-50%, -100%) rotate(-45deg);
+  transform-origin: bottom left; 
+  box-shadow: 0 2px 5px rgba(0,0,0,.35);
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease;
+}
+
+.pin:hover {
+  background: var(--brass-bright);
+  /* Keeps the pin anchored perfectly while scaling up */
+  transform: translate(-50%, -100%) rotate(-45deg) scale(1.12);
+}
     --brass:#9e1b32;
     --brass-bright:#c53047;
     --rule:#d8cfb8;
@@ -134,12 +153,6 @@
   box-shadow: 0 2px 5px rgba(0,0,0,.35);
   cursor: pointer;
   transition: transform .12s ease, background .12s ease;
-}
-
-.pin:hover {
-  background: var(--brass-bright);
-  /* Keeps the pin anchored perfectly while scaling up */
-  transform: translate(-50%, -100%) rotate(-45deg) scale(1.12);
 }
 
   .maplibregl-popup-content{
